@@ -1,0 +1,128 @@
+<html>
+    <head>
+        <title> Task Manager</title>
+    </head>
+
+    <body>
+        <h1> Task Manager</h1>
+        <input text ="text" id="taskInput" placeholder="Enter a task" />
+        <button onclick="addTask()"> Add Task</button>
+
+        <hr>
+
+        <ul id="taskList"></ul>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f4f4f4;
+        padding: 40px;
+        max-width: 600px;
+        margin: auto;
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+
+    #taskInput {
+        width: 70%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    button {
+        padding: 10px 15px;
+        font-size: 16px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #218838;
+    }
+
+    #taskList {
+        margin-top: 30px;
+        padding: 0;
+    }
+
+    li {
+        background-color: white;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    li button {
+        background-color: #dc3545;
+        padding: 6px 10px;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+
+    li button:hover {
+        background-color: #c82333;
+    }
+</style>
+        <script>
+            function addTask() {
+                alert("Add Task button clicked");
+            }
+    
+            async function fetchTasks() {
+                const response = await fetch('/tasks');
+                const tasks = await response.json();
+
+                const list = document.getElementById('taskList');
+                list.innerHTML = '';
+
+            tasks.forEach(task => {
+                const item = document.createElement('li');
+                item.innerHTML = `
+                    ${task.title}
+                    <button onclick="deleteTask(${task.id})">❌</button>
+            `   ;
+                list.appendChild(item);
+            });
+        }
+
+    
+        async function addTask() {
+            const input = document.getElementById('taskInput');
+            const title = input.value.trim();
+            if (!title) return;
+
+            await fetch('/task', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title })
+            });
+
+            input.value = '';
+            fetchTasks(); // refresh list
+        }
+
+        
+        async function deleteTask(id) {
+            await fetch(`/task/${id}`, { method: 'DELETE' });
+            fetchTasks(); // refresh list
+        }
+
+        
+        fetchTasks();
+
+   
+            
+        </script>
+    </body>
+</html>
